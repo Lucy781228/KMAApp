@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+    <!--
+    SPDX-FileCopyrightText: Lucy Mills <ct040407@actvn.edu.vn>
+    SPDX-License-Identifier: CC0-1.0
+    -->
+    <id>kmaapp</id>
+    <name>K M A App</name>
+    <summary>1</summary>
+    <description><![CDATA[1]]></description>
+    <version>0.0.1</version>
+    <licence>agpl</licence>
+    <author mail="ct040407@actvn.edu.vn" >Lucy Mills</author>
+    <namespace>KMAApp</namespace>
+    <category>organization</category>
+    <bugs>https://apps.nextcloud.com/developer/apps/generate</bugs>
+    <dependencies>
+        <nextcloud min-version="25" max-version="25"/>
+    </dependencies>
+    <navigations>
+        <navigation>
+            <name>KMA App</name>
+            <route>kmaapp.page.index</route>
+        </navigation>
+    </navigations>
+</info>
