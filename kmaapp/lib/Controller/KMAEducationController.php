@@ -73,22 +73,12 @@ class KMAEducationController extends Controller{
             ->from('kma_education')
             ->where($query->expr()->eq('kma_uid', $query->createNamedParameter($kma_uid)));
 
-        $result = $query->execute();
-        $data = $result->fetch();
-        if ($data === false) {
-            return new DataResponse([], Http::STATUS_NOT_FOUND);
-        }
-        return new DataResponse([
-            'Ma dao tao' => $data['education_id'],
-            'Ma can bo' => $data['kma_uid'],
-            'Nam tot nghiep' => $data['graduate_time'],
-            'Ngay bat dau' => $data['admision_time'],
-            'Don vi dao tao' => $data['training_unit'],
-            'Chuyen nganh' => $data['specialization'],
-            'Van bang' => $data['diploma'],
-            'Ket qua' => $data['graduated_with'],
-            // Add other desired user information here
-        ]);
+            $result = $query->execute();
+            $educations = $result->fetchAll();
+            if ($educations === false) {
+                return new DataResponse([], Http::STATUS_NOT_FOUND);
+            }
+            return ['educations' => $educations];
     }	
 
     /**

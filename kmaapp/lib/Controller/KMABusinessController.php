@@ -72,20 +72,11 @@ class KMABusinessController  extends Controller{
             ->where($query->expr()->eq('kma_uid', $query->createNamedParameter($kma_uid)));
 
         $result = $query->execute();
-        $data = $result->fetch();
-        if ($data === false) {
+        $businesses = $result->fetchAll();
+        if ($businesses === false) {
             return new DataResponse([], Http::STATUS_NOT_FOUND);
         }
-        return ['businesses' => $data];
-        // return new DataResponse([
-        //     'Ma cong tac' => $data['business_id'],
-        //     'Ma can bo' => $data['kma_uid'],
-        //     'Ngay bat dau' => $data['start_time'],
-        //     'Ngay ket thuc' => $data['end_time'],
-        //     'Don vi' => $data['unit'],
-        //     'Chuc vu' => $data['position'],
-        //     // Add other desired user information here
-        // ]);
+        return ['businesses' => $businesses];
     }	
 	
 

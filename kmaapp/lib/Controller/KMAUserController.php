@@ -1,19 +1,28 @@
 <?php
 namespace OCA\KMAApp\Controller;
-
+use OCA\Provisioning_API\Controller\UsersController;
 use OCP\IRequest;
 use OCP\IDBConnection;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
+use OCP\IUserSession;
+use OCP\IUserManager;
+use OCP\IGroupManager;
 
 class KMAUserController  extends Controller{
     private $db;
+    private $userSession;
+    private $groupManager;
+    private $userManager;
 
-    public function __construct($AppName, IRequest $request, IDBConnection $db) {
+    public function __construct($AppName, IRequest $request, IDBConnection $db, IUserSession $userSession, IGroupManager $groupManager, IUserManager $userManager) {
         parent::__construct($AppName, $request);
         $this->db = $db;
+        $this->userSession = $userSession;
+        $this->groupManager = $groupManager;
+        $this->userManager = $userManager;
     }
 
 	/**
@@ -31,7 +40,23 @@ class KMAUserController  extends Controller{
         return new DataResponse($message);
     }
 
+    public function checkAdmin() {
+        $currentUser = $this->userSession->getUser();
+        $uid = $currentUser->getUID();
+		$isAdmin = $this->groupManager->isAdmin($uid);
+        if ($isAdmin === false) {
+            return new DataResponse([], Http::STATUS_NOT_FOUND);
+        }
+		return ['isAdmin' => $isAdmin];
+    }
 
+    public function getUserIds() {
+        $users = \OC::$server->getUserManager()->search('');
+        $userIds = array_map(function($user) {
+            return $user->getUID();
+        }, $users);
+        return ['users' => $userIds];
+    }
     /**
      * @NoAdminRequired
      * @NoCSRFRequired
@@ -61,12 +86,13 @@ class KMAUserController  extends Controller{
             ->where($query->expr()->eq('kma_uid', $query->createNamedParameter($kma_uid)));
 
         $result = $query->execute();
-        $data = $result->fetch();
-        if ($data === false) {
+        $users = $result->fetchAll();
+        if ($users === false) {
             return new DataResponse([], Http::STATUS_NOT_FOUND);
         }
-        return ['users' => $data];
+        return ['users' => $users];
     }	
+
 	
     public function createKMAUser($kma_uid, $full_name, $date_of_birth, $gender, $phone, $address, $id_number, $email, $position_id, $salary, $coefficients_salary, $tax, $day_joined, $communist_party_joined, $communist_party_confirmed, $unit_id) {
         $query = $this->db->getQueryBuilder();

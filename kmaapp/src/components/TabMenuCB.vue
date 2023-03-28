@@ -1,35 +1,7 @@
 <template>
   <div class="wrapper">
     <div class="header">
-      <h2>hhgg</h2>
-      <div class="combo-action">
-        <NcButton v-show="!edit" :disabled="disabled" :readonly="readonly" type="primary" :wide="true"
-          @click="changeEdit">
-          <template #icon>
-            <PencilOutline :size="20" />
-          </template>
-          <template>Chỉnh sửa hồ sơ</template>
-        </NcButton>
-        <NcButton v-show="!edit" :disabled="disabled" :readonly="readonly" type="error" :wide="true" @click="edit = true">
-          <template #icon>
-            <ArrowUpDropCircleOutline :size="20" />
-          </template>
-          <template>Quay lại</template>
-        </NcButton>
-        <NcButton v-show="edit" :disabled="disabled" :readonly="readonly" type="error" :wide="true" @click="edit = false">
-          <template #icon>
-            <PencilOutline :size="20" />
-          </template>
-          <template>Hủy</template>
-        </NcButton>
-        <NcButton v-show="edit" :disabled="disabled" :readonly="readonly" type="primary" :wide="true"
-          @click="changeSave">
-          <template #icon>
-            <ArrowUpDropCircleOutline :size="20" />
-          </template>
-          <template>Lưu</template>
-        </NcButton>
-      </div>
+      <h2>{{ user[0].full_name }}</h2>
     </div>
     <br>
     <div class="tab-border">
@@ -40,7 +12,11 @@
         </div>
       </div>
       <div class="tab-content">
-        <component :save="save" :edit="edit" :kma_uid="kma_uid" :is="tabs[selectedTab].component"></component>
+        <component @user-updated="updateDataUser" @business-updated="updateDataBusiness" @education-updated="updateDataEducation"
+        @khenthuong-updated="updateDataKhenThuong" @kyluat-updated="updateDataKyLuat" @relation-updated="updateDataRelation"
+        :business="business" :kma_uid="kma_uid" :education="education" :kyLuat="kyLuat" :khenThuong="khenThuong" :relation="relation"
+          :is="tabs[selectedTab].component">
+        </component>
       </div>
     </div>
 
@@ -54,16 +30,21 @@ import QTDaoTao from './QTDaoTao'
 import QTKyLuat from './QTKyLuat'
 import QTKhenThuong from './QTKhenThuong'
 import ThanNhan from './ThanNhan'
-import PencilOutline from 'vue-material-design-icons/PencilOutline'
-import ArrowUpDropCircleOutline from 'vue-material-design-icons/ArrowUpDropCircleOutline'
-import { NcButton } from "@nextcloud/vue";
+import { generateUrl } from '@nextcloud/router'
+import { showError, showSuccess } from '@nextcloud/dialogs'
+import axios from '@nextcloud/axios'
 
 export default {
   name: "TabMenuCB",
   data() {
     return {
-      edit: false,
-      save: true,
+      user: [],
+      business: [],
+      education: [],
+      khenThuong: [],
+      kyLuat: [],
+      bonus: [],
+      relation: [],
       selectedTab: 0,
       tabs: [
         { title: 'Thông tin chung', component: 'ThongTinChung' },
@@ -75,11 +56,15 @@ export default {
       ],
     }
   },
-  props: ['kma_uid'],
-  computed: {
-    fullName() {
-      // return this.$route.query.full_name
-    }
+  props: ['kma_uid',],
+
+  mounted() {
+    this.fetchUsers()
+    this.fetchBusinesses()
+    this.fetchEducations()
+    this.fetchKhenThuong()
+    this.fetchKyLuat()
+    this.fetchRelations()
   },
   components: {
     ThongTinChung,
@@ -88,20 +73,88 @@ export default {
     QTKhenThuong,
     QTKyLuat,
     ThanNhan,
-    PencilOutline,
-    ArrowUpDropCircleOutline,
-    NcButton
   },
   methods: {
-    changeEdit() {
-      this.edit = true
-      this.save = false
-      console.log(this.kma_uid)
+    async fetchUsers() {
+      try {
+        const response = await axios.get(generateUrl('apps/kmaapp/kma_user/' + this.kma_uid))
+        console.log(response.data.users)
+        this.user = response.data.users
+        console.log(this.user)
+      } catch (e) {
+        console.error(e)
+      }
     },
-    changeSave() {
-      this.save = true
-      this.edit = false
+    async fetchBusinesses() {
+      try {
+        const response = await axios.get(generateUrl('apps/kmaapp/kma_business_by_uid/' + this.kma_uid))
+        this.business = response.data.businesses
+        console.log(this.business)
+      } catch (e) {
+        console.error(e)
+      }
     },
+    async fetchRelations() {
+      try {
+        const response = await axios.get(generateUrl('apps/kmaapp/kma_relation_by_uid/' + this.kma_uid))
+        this.relation = response.data.relations
+      } catch (e) {
+        console.error(e)
+      }
+    },
+
+    async fetchEducations() {
+      try {
+        const response = await axios.get(generateUrl('apps/kmaapp/kma_education_by_uid/' + this.kma_uid))
+        this.education = response.data.educations
+      } catch (e) {
+        console.error(e)
+      }
+    },
+
+    async fetchKhenThuong() {
+      try {
+        const response = await axios.get(generateUrl('apps/kmaapp/kma_bonus_by_uid/' + this.kma_uid))
+        this.bonus = response.data.bonuses
+        this.khenThuong = this.bonus.filter((e) => e.type === 1)
+      } catch (e) {
+        console.error(e)
+      }
+    },
+
+    async fetchKyLuat() {
+      try {
+        const response = await axios.get(generateUrl('apps/kmaapp/kma_bonus_by_uid/' + this.kma_uid))
+        this.bonus = response.data.bonuses
+        this.kyLuat = this.bonus.filter((e) => e.type === 0)
+      } catch (e) {
+        console.error(e)
+      }
+    },
+
+    updateDataUser(user) {
+      this.user = user
+    },
+
+    updateDataBusiness(business) {
+      this.business = business
+    },
+
+    updateDataEducation(education) {
+      this.education = education
+    },
+
+    updateDataRelation(relation) {
+      this.relation = relation
+    },
+
+    updateDataKhenThuong(khenThuong) {
+      this.khenThuong = khenThuong
+    },
+
+    updateDataKyLuat(kyLuat) {
+      this.kyLuat = kyLuat
+    }
   },
 }
 </script>

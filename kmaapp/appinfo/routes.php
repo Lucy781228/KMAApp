@@ -11,13 +11,6 @@ declare(strict_types=1);
  * The controller class has to be registered in the application.php file since
  * it's instantiated in there
  */
-// return [
-// 	'routes' => [
-// 		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
-// 		['name' => 'canbo#getAllKMAUser', 'url' => '/all_kma_user', 'verb' => 'GET'],
-// 		['name' => 'canbo#exportToExcel', 'url' => '/excel', 'verb' => 'GET'],
-// 	]
-// ];
 return [
     'routes' => [
         
@@ -27,12 +20,14 @@ return [
 
 		#Canbo
 		['name' => 'KMAUser#getAllKMAUser', 'url' => '/all_kma_user', 'verb' => 'GET'],
+		['name' => 'KMAUser#getUserIds', 'url' => '/all_user', 'verb' => 'GET'],
 		['name' => 'KMAUser#getKMAUser', 'url' => '/kma_user/{kma_uid}', 'verb' => 'GET'],
 		['name' => 'KMAUser#getKMAUserbyPosition', 'url' => '/kma_user_by_position/{position_id}', 'verb' => 'GET'],
 		['name' => 'KMAUser#getKMAUserbyUnit', 'url' => '/kma_user_by_unit/{unit_id}', 'verb' => 'GET'],
 		['name' => 'KMAUser#createKMAUser', 'url' => '/create_kma_user', 'verb' => 'POST'],
 		['name' => 'KMAUser#deleteKMAUser', 'url' => '/delete_kma_user/{kma_uid}', 'verb' => 'DELETE'],
 		['name' => 'KMAUser#updateInfoKMAUser', 'url' => '/update_kma_user', 'verb' => 'PUT'],
+		['name' => 'KMAUser#checkAdmin', 'url' => '/check_admin', 'verb' => 'GET'],
 		
 
 		#Nguoithan
@@ -41,23 +36,23 @@ return [
 		['name' => 'KMARelations#getKMARelationBykmaUID', 'url' => '/kma_relation_by_uid/{kma_uid}', 'verb' => 'GET'],
 		['name' => 'KMARelations#createKMARelation', 'url' => '/create_kma_relation', 'verb' => 'POST'],
 		['name' => 'KMARelations#deleteKMARelation', 'url' => '/delete_kma_relation/{relations_id}', 'verb' => 'DELETE'],
-		['name' => 'KMARelations#updateInfoKMARelation', 'url' => '/update_kma_relation/{relations_id}', 'verb' => 'PUT'],
+		['name' => 'KMARelations#updateInfoKMARelation', 'url' => '/update_kma_relation', 'verb' => 'PUT'],
 
 		#Daotao
 		['name' => 'KMAEducation#createKMAEducation', 'url' => '/create_kma_education', 'verb' => 'POST'],
 		['name' => 'KMAEducation#getAllKMAEducation', 'url' => '/all_kma_educations', 'verb' => 'GET'],
 		['name' => 'KMAEducation#getKMAEducation', 'url' => '/kma_education/{education_id}', 'verb' => 'GET'],
 		['name' => 'KMAEducation#getKMAEducationByUID', 'url' => '/kma_education_by_uid/{kma_uid}', 'verb' => 'GET'],
-		['name' => 'KMAEducation#updateInfoKMAEducation', 'url' => '/update_kma_education/{education_id}', 'verb' => 'PUT'],
+		['name' => 'KMAEducation#updateInfoKMAEducation', 'url' => '/update_kma_education', 'verb' => 'PUT'],
 		['name' => 'KMAEducation#deleteKMAEducation', 'url' => '/delete_kma_education/{education_id}', 'verb' => 'DELETE'],
 
 		#Congtac
 		['name' => 'KMABusiness#createKMABusiness', 'url' => '/create_kma_business', 'verb' => 'POST'],
 		['name' => 'KMABusiness#getAllKMABusiness', 'url' => '/all_kma_businesses', 'verb' => 'GET'],
 		['name' => 'KMABusiness#getKMABusiness', 'url' => '/kma_business/{business_id}', 'verb' => 'GET'],
-		['name' => 'KMABusiness#getKMABusinessByUID', 'url' => '/kma_business_by_uid', 'verb' => 'GET'],
+		['name' => 'KMABusiness#getKMABusinessByUID', 'url' => '/kma_business_by_uid/{kma_uid}', 'verb' => 'GET'],
 		['name' => 'KMABusiness#deleteKMABusiness', 'url' => '/delete_kma_business/{business_id}', 'verb' => 'DELETE'],
-		['name' => 'KMABusiness#updateInfoKMABusiness', 'url' => '/update_kma_business/{business_id}', 'verb' => 'PUT'],
+		['name' => 'KMABusiness#updateInfoKMABusiness', 'url' => '/update_kma_business', 'verb' => 'PUT'],
 
 		#Chucvu
 		['name' => 'KMAPosition#createKMAPosition', 'url' => '/create_kma_position', 'verb' => 'POST'],
@@ -79,7 +74,7 @@ return [
 		['name' => 'KMABonus#getKMABonus', 'url' => '/kma_bonus/{bonus_id}', 'verb' => 'GET'],
 		['name' => 'KMABonus#getKMABonusbyUID', 'url' => '/kma_bonus_by_uid/{kma_uid}', 'verb' => 'GET'],
 		['name' => 'KMABonus#deleteKMABonus', 'url' => '/delete_kma_bonus/{bonus_id}', 'verb' => 'DELETE'],
-		['name' => 'KMABonus#updateInfoKMABonus', 'url' => '/update_kma_bonus/{bonus_id}', 'verb' => 'PUT'],
+		['name' => 'KMABonus#updateInfoKMABonus', 'url' => '/update_kma_bonus', 'verb' => 'PUT'],
 
     ],
 ];

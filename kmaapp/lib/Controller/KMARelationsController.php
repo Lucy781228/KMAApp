@@ -71,20 +71,12 @@ class KMARelationsController extends Controller{
             ->from('kma_relations')
             ->where($query->expr()->eq('kma_uid', $query->createNamedParameter($kma_uid)));
 
-        $result = $query->execute();
-        $data = $result->fetch();
-        if ($data === false) {
-            return new DataResponse([], Http::STATUS_NOT_FOUND);
-        }
-        return new DataResponse([
-            'Ma nguoi than' => $data['relations_id'],
-            'Ma can bo' => $data['kma_uid'],
-            'Ho va Ten' => $data['  = null'],
-            'Ngay sinh' => $data['date_of_birth'],
-            'So dien thoai' => $data['phone'],
-            'Dia chi' => $data['address'],
-            // Add other desired user information here
-        ]);
+            $result = $query->execute();
+            $relations = $result->fetchAll();
+            if ($relations === false) {
+                return new DataResponse([], Http::STATUS_NOT_FOUND);
+            }
+            return ['relations' => $relations];
     }
     
     /**

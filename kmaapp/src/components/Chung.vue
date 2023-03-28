@@ -1,7 +1,7 @@
 <template>
   <div>
-    <TabMenuCB v-if="showComponent" />
-    <div v-show="!usersExist">
+    <div v-if="loading"></div>
+    <div v-else-if="!usersExist">
       <br><br>
       <div :style="{ textAlign: '#center' }">
         Không có dữ liệu.
@@ -14,7 +14,7 @@
         <template>Thêm mới</template>
       </NcButton>
     </div>
-    <div class="wrap" v-if="usersExist">
+    <div v-else class="wrap">
       <div class="combo-action">
         <NcButton :disabled="disabled" :readonly="readonly" type="primary" :wide="true" @click="show = !show">
           <template #icon>
@@ -22,7 +22,7 @@
           </template>
           <template>Thêm mới</template>
         </NcButton>
-        <NcButton :disabled="disabled" :readonly="readonly" type="success" :wide="true">
+        <NcButton :disabled="disabled" :readonly="readonly" type="success" :wide="true" @click="exportExcel">
           <template #icon>
             <DatabaseExportOutline :size="20" />
           </template>
@@ -30,7 +30,7 @@
         </NcButton>
         <NcButton :disabled="disabled" :readonly="readonly" type="error" :wide="true" @click="deleteUser">
           <template #icon>
-            <DeleteAlertOutline :size="20" />
+            <DeleteOutline :size="20" />
           </template>
           <template>Xóa</template>
         </NcButton>
@@ -74,27 +74,27 @@
       </tbody>
     </table>
     <div v-if="show">
-      <NewUser @refresh-user-list="fetchUsers" />
+      <NewUser @modal-updated="updateModal" @refresh-user-list="fetchUsers" />
     </div>
   </div>
 </template>
 
 <script>
+import * as XLSX from 'xlsx';
 import { subscribe, unsubscribe } from "@nextcloud/event-bus";
 import { NcButton, NcActions, NcActionButton } from "@nextcloud/vue";
 import DatabaseExportOutline from 'vue-material-design-icons/DatabaseExportOutline'
 import Plus from 'vue-material-design-icons/Plus'
-import DeleteAlertOutline from 'vue-material-design-icons/DeleteAlertOutline'
+import DeleteOutline from 'vue-material-design-icons/DeleteOutline'
 import ViewList from 'vue-material-design-icons/ViewList'
 import NewUser from './NewUser'
-import TabMenuCB from './TabMenuCB'
 import { generateUrl } from '@nextcloud/router'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import axios from '@nextcloud/axios'
 
 
 export default {
-  name: "UserList",
+  name: "Chung",
   components: {
     NcButton,
     NcActions,
@@ -103,12 +103,11 @@ export default {
     NewUser,
     DatabaseExportOutline,
     Plus,
-    DeleteAlertOutline,
-    TabMenuCB,
+    DeleteOutline,
   },
-  props: ['selectedTab'],
   data() {
     return {
+      loading: false,
       showComponent: false,
       show: false,
       checkedAll: false,
@@ -152,6 +151,30 @@ export default {
   },
 
   methods: {
+    exportExcel() {
+      const data = this.users.map((item) => {
+        return {
+          'Họ và tên': item.full_name,
+          'Ngày sinh': item.date_of_birth,
+          'Giới tính': this.isMale(item.gender) ? 'Nam' : this.isFeMale(item.gender) ? 'Nữ' : '',
+          'Đơn vị': this.userUnit(item.unit_id),
+          'Chức vụ': this.userPosition(item.position_id),
+          'Tên người dùng': item.kma_uid,
+          'Email': item.email
+        };
+      });
+      // Creating a workbook using SheetJS
+      const workbook = XLSX.utils.book_new();
+
+      // Creating a worksheet and adding the data to it
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Users');
+
+      // Creating the file and downloading it
+      const filename = 'CanBo.xlsx';
+      XLSX.writeFile(workbook, filename);
+    },
+
     deleteUser() {
       this.users.forEach(user => {
         if (user.checked) this.deleteUserAPI(user.kma_uid)
@@ -159,6 +182,10 @@ export default {
       showError(t('kmaapp', 'Xóa thành công!'))
     },
 
+    updateModal(modal) {
+            this.show = modal
+        },
+        
     isMale(gender) {
       return gender == 1;
     },
@@ -179,8 +206,12 @@ export default {
     },
     async fetchUsers() {
       try {
+        this.loading = true
         const response = await axios.get(generateUrl('apps/kmaapp/all_kma_user'))
         this.users = response.data.users
+      this.show = false
+      this.loading = false
+
       } catch (e) {
         console.error(e)
       }
@@ -211,7 +242,6 @@ export default {
     },
 
     updateCheckedItems() {
-      // this.selectedItems = this.items.filter(item => item.selected)
       this.checkedAll = this.users.every(user => user.checked);
     },
   }

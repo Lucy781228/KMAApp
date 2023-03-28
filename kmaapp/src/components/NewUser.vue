@@ -10,8 +10,11 @@
           </div>
           <div class="block-list__item">
             <label>Tên người dùng (*)</label>
-            <NcTextField :value.sync="user.tenNguoiDung" />
-            <!-- <span v-if="!tenNguoiDung">Please fill out this field</span> -->
+            <select class="field" v-model="user.tenNguoiDung">
+              <option v-for="(item, index) in usersNC" :key="index">
+                {{ item }}
+              </option>
+            </select>
           </div>
           <div class="block-list__item">
             <label>Giới tính</label>
@@ -131,11 +134,15 @@ export default {
       ],
       donvi: [],
       chucvu: [],
+      usersNC: [],
+      users: []
     };
   },
   mounted() {
     this.fetchPositions()
     this.fetchUnits()
+    this.fetchNCUsers()
+    // this.findUsers()
   },
   methods: {
     async fetchPositions() {
@@ -156,6 +163,30 @@ export default {
         showError(t('kmaapp', 'Có lỗi xảy ra!'))
       }
     },
+
+    async fetchNCUsers() {
+      try {
+        const response = await axios.get(generateUrl('apps/kmaapp/all_user'))
+        this.usersNC = Object.values(response.data.users)
+      console.log(this.usersNC)
+      await this.fetchUsers()
+      this.usersNC = this.usersNC.filter(uid => !this.users.map(user => user.kma_uid).includes(uid));
+      console.log(this.usersNC)
+
+      } catch (e) {
+        console.error(e)
+      }
+    },
+
+    async fetchUsers() {
+      try {
+        const response = await axios.get(generateUrl('apps/kmaapp/all_kma_user'))
+        this.users = response.data.users
+      } catch (e) {
+        console.error(e)
+      }
+    },
+
     async createUser(event) {
       event.preventDefault()
       try {
@@ -179,31 +210,18 @@ export default {
         });
         this.$emit('refresh-user-list');
         showSuccess(t('kmaapp', 'Tạo thành công!'))
-      this.modal = false
+        this.modal = false
       } catch (e) {
         console.error(e);
         showError(t('kmaapp', 'Could not create the user'));
       }
     },
     showModal() {
-      this.hoVaTen = "",
-        this.gioiTinh = "",
-        this.ngaySinh = "",
-        this.diaChi = "",
-        this.sdt = "",
-        this.email = "",
-        this.cccd = "",
-        this.tenNguoiDung = "",
-        this.donVi = "",
-        this.chucVu = "",
-        this.ngayVaoDang = "",
-        this.luong = "",
-        this.heSoLuong = "",
-        this.bacThue = "",
-        this.modal = true;
+      this.modal = true;
     },
     closeModal() {
       this.modal = false;
+      this.$emit('modal-updated', this.modal)
     },
   },
 };

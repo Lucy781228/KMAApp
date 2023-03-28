@@ -58,6 +58,7 @@
     "vue": "^2.7.0",
     "vue-click-outside": "^1.1.0",
     "vue-infinite-loading": "^2.4.5",
+    "vue-json-csv": "^2.1.0",
     "vue-loader": "^15.10.1",
     "vue-localstorage": "^0.6.2",
     "vue-material-design-icons": "^5.1.2",
@@ -66,7 +67,8 @@
     "vue-template-compiler": "^2.7.14",
     "webpack": "^5.75.0",
     "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.11.1"
+    "webpack-dev-server": "^4.11.1",
+    "xlsx": "^0.18.5"
   },
   "browserslist": [
     "extends @nextcloud/browserslist-config"
